@@ -1,0 +1,73 @@
+21/06/05 15:13:37 INFO SparkContext: Running Spark version 3.0.0
+21/06/05 15:13:39 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+21/06/05 15:13:40 INFO ResourceUtils: ==============================================================
+21/06/05 15:13:40 INFO ResourceUtils: Resources for spark.driver:
+21/06/05 15:13:40 INFO ResourceUtils: ==============================================================
+21/06/05 15:13:40 INFO SparkContext: Submitted application: RDDOperatorTransform
+21/06/05 15:13:40 INFO SecurityManager: Changing view acls to: r7763
+21/06/05 15:13:40 INFO SecurityManager: Changing modify acls to: r7763
+21/06/05 15:13:40 INFO SecurityManager: Changing view acls groups to:
+21/06/05 15:13:40 INFO SecurityManager: Changing modify acls groups to:
+21/06/05 15:13:40 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users  with view permissions: Set(r7763); groups with view permissions: Set(); users  with modify permissions: Set(r7763); groups with modify permissions: Set()
+21/06/05 15:13:42 INFO Utils: Successfully started service 'sparkDriver' on port 13354.
+21/06/05 15:13:42 INFO SparkEnv: Registering MapOutputTracker
+21/06/05 15:13:42 INFO SparkEnv: Registering BlockManagerMaster
+21/06/05 15:13:42 INFO BlockManagerMasterEndpoint: Using org.apache.spark.storage.DefaultTopologyMapper for getting topology information
+21/06/05 15:13:42 INFO BlockManagerMasterEndpoint: BlockManagerMasterEndpoint up
+21/06/05 15:13:42 INFO SparkEnv: Registering BlockManagerMasterHeartbeat
+21/06/05 15:13:42 INFO DiskBlockManager: Created local directory at C:\Users\r7763\AppData\Local\Temp\blockmgr-a4edf9e1-99c1-456f-a36c-775c923d77e6
+21/06/05 15:13:43 INFO MemoryStore: MemoryStore started with capacity 897.6 MiB
+21/06/05 15:13:43 INFO SparkEnv: Registering OutputCommitCoordinator
+21/06/05 15:13:44 INFO Utils: Successfully started service 'SparkUI' on port 4040.
+21/06/05 15:13:44 INFO SparkUI: Bound SparkUI to 0.0.0.0, and started at http://DESKTOP-R0JBNMO:4040
+21/06/05 15:13:45 INFO Executor: Starting executor ID driver on host DESKTOP-R0JBNMO
+21/06/05 15:13:45 INFO Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 13379.
+21/06/05 15:13:45 INFO NettyBlockTransferService: Server created on DESKTOP-R0JBNMO:13379
+21/06/05 15:13:45 INFO BlockManager: Using org.apache.spark.storage.RandomBlockReplicationPolicy for block replication policy
+21/06/05 15:13:45 INFO BlockManagerMaster: Registering BlockManager BlockManagerId(driver, DESKTOP-R0JBNMO, 13379, None)
+21/06/05 15:13:45 INFO BlockManagerMasterEndpoint: Registering block manager DESKTOP-R0JBNMO:13379 with 897.6 MiB RAM, BlockManagerId(driver, DESKTOP-R0JBNMO, 13379, None)
+21/06/05 15:13:45 INFO BlockManagerMaster: Registered BlockManager BlockManagerId(driver, DESKTOP-R0JBNMO, 13379, None)
+21/06/05 15:13:45 INFO BlockManager: Initialized BlockManager: BlockManagerId(driver, DESKTOP-R0JBNMO, 13379, None)
+21/06/05 15:13:48 INFO SparkContext: Starting job: collect at RDDOperatorTransform.scala:15
+21/06/05 15:13:48 INFO DAGScheduler: Got job 0 (collect at RDDOperatorTransform.scala:15) with 4 output partitions
+21/06/05 15:13:48 INFO DAGScheduler: Final stage: ResultStage 0 (collect at RDDOperatorTransform.scala:15)
+21/06/05 15:13:48 INFO DAGScheduler: Parents of final stage: List()
+21/06/05 15:13:48 INFO DAGScheduler: Missing parents: List()
+21/06/05 15:13:48 INFO DAGScheduler: Submitting ResultStage 0 (MapPartitionsRDD[1] at map at RDDOperatorTransform.scala:14), which has no missing parents
+21/06/05 15:13:48 INFO MemoryStore: Block broadcast_0 stored as values in memory (estimated size 3.0 KiB, free 897.6 MiB)
+21/06/05 15:13:49 INFO MemoryStore: Block broadcast_0_piece0 stored as bytes in memory (estimated size 1809.0 B, free 897.6 MiB)
+21/06/05 15:13:49 INFO BlockManagerInfo: Added broadcast_0_piece0 in memory on DESKTOP-R0JBNMO:13379 (size: 1809.0 B, free: 897.6 MiB)
+21/06/05 15:13:49 INFO SparkContext: Created broadcast 0 from broadcast at DAGScheduler.scala:1200
+21/06/05 15:13:49 INFO DAGScheduler: Submitting 4 missing tasks from ResultStage 0 (MapPartitionsRDD[1] at map at RDDOperatorTransform.scala:14) (first 15 tasks are for partitions Vector(0, 1, 2, 3))
+21/06/05 15:13:49 INFO TaskSchedulerImpl: Adding task set 0.0 with 4 tasks
+21/06/05 15:13:49 INFO TaskSetManager: Starting task 0.0 in stage 0.0 (TID 0, DESKTOP-R0JBNMO, executor driver, partition 0, PROCESS_LOCAL, 7278 bytes)
+21/06/05 15:13:49 INFO TaskSetManager: Starting task 1.0 in stage 0.0 (TID 1, DESKTOP-R0JBNMO, executor driver, partition 1, PROCESS_LOCAL, 7278 bytes)
+21/06/05 15:13:49 INFO TaskSetManager: Starting task 2.0 in stage 0.0 (TID 2, DESKTOP-R0JBNMO, executor driver, partition 2, PROCESS_LOCAL, 7278 bytes)
+21/06/05 15:13:49 INFO TaskSetManager: Starting task 3.0 in stage 0.0 (TID 3, DESKTOP-R0JBNMO, executor driver, partition 3, PROCESS_LOCAL, 7278 bytes)
+21/06/05 15:13:49 INFO Executor: Running task 3.0 in stage 0.0 (TID 3)
+21/06/05 15:13:49 INFO Executor: Running task 1.0 in stage 0.0 (TID 1)
+21/06/05 15:13:49 INFO Executor: Running task 2.0 in stage 0.0 (TID 2)
+21/06/05 15:13:49 INFO Executor: Running task 0.0 in stage 0.0 (TID 0)
+21/06/05 15:13:50 INFO Executor: Finished task 2.0 in stage 0.0 (TID 2). 867 bytes result sent to driver
+21/06/05 15:13:50 INFO Executor: Finished task 3.0 in stage 0.0 (TID 3). 867 bytes result sent to driver
+21/06/05 15:13:50 INFO Executor: Finished task 1.0 in stage 0.0 (TID 1). 867 bytes result sent to driver
+21/06/05 15:13:50 INFO Executor: Finished task 0.0 in stage 0.0 (TID 0). 867 bytes result sent to driver
+21/06/05 15:13:50 INFO TaskSetManager: Finished task 2.0 in stage 0.0 (TID 2) in 1223 ms on DESKTOP-R0JBNMO (executor driver) (1/4)
+21/06/05 15:13:50 INFO TaskSetManager: Finished task 0.0 in stage 0.0 (TID 0) in 1362 ms on DESKTOP-R0JBNMO (executor driver) (2/4)
+21/06/05 15:13:50 INFO TaskSetManager: Finished task 1.0 in stage 0.0 (TID 1) in 1247 ms on DESKTOP-R0JBNMO (executor driver) (3/4)
+21/06/05 15:13:50 INFO TaskSetManager: Finished task 3.0 in stage 0.0 (TID 3) in 1245 ms on DESKTOP-R0JBNMO (executor driver) (4/4)
+21/06/05 15:13:50 INFO TaskSchedulerImpl: Removed TaskSet 0.0, whose tasks have all completed, from pool
+21/06/05 15:13:50 INFO DAGScheduler: ResultStage 0 (collect at RDDOperatorTransform.scala:15) finished in 2.254 s
+21/06/05 15:13:50 INFO DAGScheduler: Job 0 is finished. Cancelling potential speculative or zombie tasks for this job
+21/06/05 15:13:50 INFO TaskSchedulerImpl: Killing all running tasks in stage 0: Stage finished
+21/06/05 15:13:50 INFO DAGScheduler: Job 0 finished: collect at RDDOperatorTransform.scala:15, took 2.405838 s
+21/06/05 15:13:50 INFO SparkContext: Invoking stop() from shutdown hook
+21/06/05 15:13:50 INFO SparkUI: Stopped Spark web UI at http://DESKTOP-R0JBNMO:4040
+21/06/05 15:13:50 INFO MapOutputTrackerMasterEndpoint: MapOutputTrackerMasterEndpoint stopped!
+21/06/05 15:13:50 INFO MemoryStore: MemoryStore cleared
+21/06/05 15:13:50 INFO BlockManager: BlockManager stopped
+21/06/05 15:13:50 INFO BlockManagerMaster: BlockManagerMaster stopped
+21/06/05 15:13:50 INFO OutputCommitCoordinator$OutputCommitCoordinatorEndpoint: OutputCommitCoordinator stopped!
+21/06/05 15:13:50 INFO SparkContext: Successfully stopped SparkContext
+21/06/05 15:13:50 INFO ShutdownHookManager: Shutdown hook called
+21/06/05 15:13:50 INFO ShutdownHookManager: Deleting directory C:\Users\r7763\AppData\Local\Temp\spark-b11a5098-1109-4078-b078-f6ac11b61aed
