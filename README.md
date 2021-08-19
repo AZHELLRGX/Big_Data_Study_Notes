@@ -10,7 +10,7 @@
 
 ## **:sparkles:**Spark
 
-1、[Spark核心知识点](notes/Spark/Spark Core.md)
+1、[Spark核心知识点](notes/Spark/SparkCore.md)
 
 2、[Spark调优](notes/Spark/调优.md)
 
@@ -24,5 +24,5 @@
 
 ## **:sparkles:**Hive
 
-1、[Hive命令大全](notes/Hive/Hive 命令大全.md)
+1、[Hive命令大全](notes/Hive/Hive命令大全.md)
 
