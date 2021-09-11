@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ 3、如果数据自带了header，可以直接使用
+ spark.read.format("text").option("header", true).option("delimiter", ",").load("hdfs://bigserver1:9000/test/spark/tank3");
+ 方式读取数据
+ 这样的数据一般是各地市的原始数据
+ -->
+<readFromHDFS>
+
+    <!-- 可以直接将表结构粘贴进来 -->
+    <!-- index  columnName  columnType三个配置必须以制表符分割-->
+    <fieldMap name="resident_location_map">
+        0	CityID	int
+        1	Day	VARCHAR(50)
+        2	IMSI	VARCHAR(50)
+        3	MSISDN	VARCHAR(50)
+        4	IMEI	VARCHAR(50)
+        5	IsPM	int
+        6	Hour	int
+        7	ECI	int
+        8	Duration	int
+        9	Longitude	int
+        10	Latitude	int
+        11	BuildingID	int
+        12	Height	int
+        13	IsInDoor	int
+        14	LocType	int
+        15	LocSource	VARCHAR(20)
+        16	DataStatus	VARCHAR(20)
+        17	UpdateTime	int
+        18	ConfidenceLevel	int
+        19	Position	int
+    </fieldMap>
+
+    <!-- dataPath也支持厂商、日期等通配符设置 -->
+    <!-- 本地debug可以加上hdfs服务名称 -->
+    <sql dataPath="hdfs://master:9000/usr/rgx/resident/tb_mr_user_location_${provider}_dd_${multiDate}" delimiter="\t"
+         fieldMap="resident_location_map" sparkMapName="resident_location"
+         registerTableName="resident_location_valid" multiDays="1">
+        <!-- 此处SQL可以为空,为空则Spark注册表名不生效 -->
+        SELECT * FROM resident_location WHERE CityID = 6101
+    </sql>
+</readFromHDFS>

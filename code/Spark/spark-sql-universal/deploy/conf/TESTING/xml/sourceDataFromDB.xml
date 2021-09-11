@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<readFromDB>
+
+    <!-- 将缓存相关配置设置为cache标签，统一使用MEMORY_AND_DISK -->
+    <cache>
+        <table>tb_cfg_cell_lte_indoor</table>
+        <table>tb_user_resident_location_simplify_ru1</table>
+    </cache>
+
+    <!-- sparkMapName不指定，就默认使用dbTableName名称；如果原表名是中文，还是建议配置sparkMapName -->
+    <sql dbId="BEIJING" dbTableName="tb_cfg_cell_lte" registerTableName="tb_cfg_cell_lte_indoor">
+        <!-- 此处SQL可以为空,为空则Spark注册表名不生效 -->
+        SELECT * FROM tb_cfg_cell_lte WHERE `覆盖类型` = '室内'
+    </sql>
+
+    <!-- 读取多天数据的时候，DB配置的是Main库 -->
+    <!-- cityDistribution决定了是否需要读取地市数据，废弃库默认不读取 -->
+    <!-- multiDays 当前日期往前推几天的天表是否都需要读取 -->
+    <!-- ${date}通配符只能匹配单天日期，而${multiDate}则标识可以匹配多天日期 -->
+    <sql dbId="MAIN" dbTableName="tb_常驻用户分析_数据_用户常驻地_dd_${multiDate}" sparkMapName="tb_user_resident_location_simplify"
+         registerTableName="tb_user_resident_location_simplify_ru1"
+         cityDistribution="true" multiDays="1">
+        SELECT * FROM tb_user_resident_location_simplify WHERE `位置类型` = 'ru1'
+    </sql>
+</readFromDB>

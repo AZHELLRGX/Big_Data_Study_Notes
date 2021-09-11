@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prosssing>
+    <!-- 数据处理部分其实就需要一个sql以及注册表就行了 -->
+    <!-- 数据按照SQL标签的默认顺序依次执行 -->
+    <sql registerTableName="resident_location_agg_user_duration">
+        SELECT IMSI,ECI,sum(Duration) as Duration
+        FROM resident_location_valid
+        GROUP BY IMSI,ECI
+    </sql>
+
+    <!-- 过滤常驻位置经纬度与工参距离小于50的数据 -->
+    <sql registerTableName="resident_location_simplify_with_cell_lt500m">
+        SELECT a.*
+        FROM tb_user_resident_location_simplify_ru1 a
+        JOIN tb_cfg_cell_lte_indoor b
+        ON a.ECI = b.ECI
+        AND PointDistanceFunction(
+            cast(a.`经度` / 10000000.0 as double),
+            cast(a.`纬度` / 10000000.0 as double),
+            b.`小区经度`,
+            b.`小区纬度`) &lt; 500.0
+    </sql>
+</prosssing>

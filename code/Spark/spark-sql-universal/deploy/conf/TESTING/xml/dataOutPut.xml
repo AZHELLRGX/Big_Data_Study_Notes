@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<output>
+
+    <!-- 根据模板表创建天表配置 -->
+    <!-- 还是直接将模版表表结构写在配置文件中，天表根据模版表建表语句创建即可 -->
+    <!-- 建表语句使用的是数据库本地语言 -->
+    <!-- CREATE语句前面可以加上DROP语句，表示先删后建 -->
+    <create>
+        <table model="tb_user_resident_location_simplify_filter">
+            if exists (select * from dbo.sysobjects where id = object_id(N'[tb_user_resident_location_simplify_filter]')
+            and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+            drop table [tb_user_resident_location_simplify_filter];
+            CREATE TABLE [dbo].[tb_user_resident_location_simplify_filter](
+            [CityID] [int] NOT NULL,
+            [IMSI] [varchar](50) NOT NULL,
+            [MSISDN] [varchar](50) NULL,
+            [IMEI] [varchar](50) NULL,
+            [网络类型] [varchar](20) NULL,
+            [常驻类型] [int] NULL,
+            [ECI] [int] NULL,
+            [常驻小区类型] [int] NULL,
+            [经度] [int] NULL,
+            [纬度] [int] NULL,
+            [楼宇ID] [int] NULL,
+            [高度] [int] NULL,
+            [方位] [int] NULL,
+            [位置类型] [varchar](20) NULL,
+            [定位精度] [int] NULL,
+            [置信度] [int] NULL,
+            [最近出现在驻留地时间] [varchar](20) NULL,
+            [运算周期] [int] NULL,
+            [有效运算天数] [int] NULL,
+            [驻留总时长] [int] NULL,
+            [最近判别为常驻的时间] [varchar](20) NULL,
+            [驻留状态] [int] NULL,
+            [位置信息1] [int] NULL,
+            [位置信息2] [varchar](100) NULL,
+            [位置信息3] [varchar](50) NULL,
+            [用户组ID] [bigint] NULL
+            )
+        </table>
+    </create>
+
+    <!-- 数据写出到DB -->
+    <!-- 写出模式包含：overwrite、append -->
+    <!-- sparkMapName与sql至少存在一个，会优先写出sql的执行结果，其次才会选择直接输出sparkMapName对应的表数据 -->
+    <!-- 数据可以输出至地市库，dbId需要配置为Main库连接，以获取dbSetting信息 -->
+    <!-- modelName 模版表配置 -->
+    <!-- cityDistribution 是否需要地市分发 -->
+    <sql dbId="MAIN" method="overwrite" dbTableName="tb_user_resident_location_simplify_filter_${provider}_dd_${date}"
+         modelName="tb_user_resident_location_simplify_filter"
+         sparkMapName="resident_location_simplify_with_cell_lt500m"
+         cityDistribution="true">
+    </sql>
+
+    <!-- 数据写出到DFS文件系统 -->
+    <!-- 目前写出到HDFS只支持覆写 -->
+    <sql dataPath="hdfs://master:9000/usr/rgx/resident/tb_mr_user_location_group_${provider}_dd_${date}"
+         method="overwrite"
+         sparkMapName="resident_location_agg_user_duration" delimiter="\t">
+    </sql>
+
+</output>

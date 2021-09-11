@@ -20,13 +20,13 @@
 MANIFEST.MF
 _site/
 activemq-data
-bin
+#bin
 build
 build.log
 dependency-reduced-pom.xml
 dump.rdb
 interpolated*.xml
-lib/
+#lib/
 manifest.yml
 overridedb.*
 settings.xml
