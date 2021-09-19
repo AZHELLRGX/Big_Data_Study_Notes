@@ -12,7 +12,7 @@ object DataPersistent {
   private val log: Logger = LoggerFactory.getLogger(DataPersistent.getClass)
 
   def writeData(sqlXmlEntities: ListBuffer[SqlXmlEntity], dBProperties: mutable.Map[String, DBConnectInfo],
-                mainDbSettingMap: mutable.Map[String, mutable.Map[Integer, DBConnectInfo]], session: SparkSession): Unit = {
+                mainDbSettingMap: mutable.Map[String, mutable.Map[String, DBConnectInfo]], session: SparkSession): Unit = {
     for (sqlXmlEntity <- sqlXmlEntities) {
 
       if (sqlXmlEntity.sparkMapName.nonEmpty || sqlXmlEntity.sql.nonEmpty) {
@@ -43,10 +43,10 @@ object DataPersistent {
    * @param dbSettingMap 地市库连接配置合集
    * @param session      SparkSQL上下文
    */
-  private def writeDataToCityDB(sqlXmlEntity: SqlXmlEntity, dbSettingMap: mutable.Map[Integer, DBConnectInfo], session: SparkSession): Unit = {
+  private def writeDataToCityDB(sqlXmlEntity: SqlXmlEntity, dbSettingMap: mutable.Map[String, DBConnectInfo], session: SparkSession): Unit = {
     val df = getDataFrame(sqlXmlEntity, session)
     for (elem <- dbSettingMap) {
-      val cityDF = df.filter(s"CityId=${elem._1}")
+      val cityDF = df.filter(s"CityId=${elem._1.toInt}")
       writeDataToDB(cityDF, sqlXmlEntity, elem._2)
     }
   }

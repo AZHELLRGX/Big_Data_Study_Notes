@@ -44,16 +44,16 @@ object MainJob {
     if (sqlXmlMap.contains("dataOutPut") && sqlXmlMap("dataOutPut").nonEmpty) {
 
       // Main库与地市库的映射关系
-      val mainDbSettingMap = mutable.Map[String, mutable.Map[Integer, DBConnectInfo]]()
+      val mainDbSettingMap = mutable.Map[String, mutable.Map[String, DBConnectInfo]]()
 
       // 判断是否有需要输出数据需要在地市库创建天表
       for (sqlXmlEntity <- sqlXmlMap("dataOutPut")) {
-        createCityTables(sqlXmlEntity, dBProperties, mainDbSettingMap)
+        createCityTables(sqlXmlEntity, dBProperties, mainDbSettingMap, coreConfig.cityIdFilter)
       }
 
       // 判断是否有需要输出数据需要在地市库创建天表
       for (sqlXmlEntity <- sqlXmlMap("sourceDataFromDB")) {
-        createCityTables(sqlXmlEntity, dBProperties, mainDbSettingMap)
+        createCityTables(sqlXmlEntity, dBProperties, mainDbSettingMap, coreConfig.cityIdFilter)
       }
 
       if (sqlXmlMap.contains("sourceDataFromDB")) {
@@ -69,7 +69,12 @@ object MainJob {
       }
       // 6、数据输出
       DataPersistent.writeData(sqlXmlMap("dataOutPut"), dBProperties, mainDbSettingMap, session)
+
+      for (elem <- mainDbSettingMap) {
+        writeInputDBSuccessLog(coreConfig.dateStr, elem._2)
+      }
     }
+
   }
 
   /**
@@ -80,14 +85,14 @@ object MainJob {
    * @return
    */
   def createCityTables(sqlXmlEntity: SqlXmlEntity, dBProperties: mutable.Map[String, DBConnectInfo],
-                       mainDbSettingMap: mutable.Map[String, mutable.Map[Integer, DBConnectInfo]]): Unit = {
+                       mainDbSettingMap: mutable.Map[String, mutable.Map[String, DBConnectInfo]], cityIdFilter: String): Unit = {
     if (sqlXmlEntity.cityDistribution) {
       val dBConnectInfo = dBProperties.getOrElse(sqlXmlEntity.dbId, null)
       if (dBConnectInfo == null) {
         val dbId = sqlXmlEntity.dbId
         log.warn("[{}]的数据库连接配置不存在，无法获取地市库连接信息", dbId)
       } else {
-        val integerToInfo = mainDbSettingMap.getOrElseUpdate(sqlXmlEntity.dbId, CityDBHandleUtil.getDBSetting(dBConnectInfo).asScala)
+        val integerToInfo = mainDbSettingMap.getOrElseUpdate(sqlXmlEntity.dbId, CityDBHandleUtil.getDBSetting(dBConnectInfo, cityIdFilter).asScala)
         // 在地市库创建天表
         if (sqlXmlEntity.createSQL.nonEmpty) {
           // 如果是输出配置，则可能需要创建天表
@@ -95,5 +100,17 @@ object MainJob {
         }
       }
     }
+    // 不需要在地市库创建的数据也需要建表
+    else {
+      if (sqlXmlEntity.createSQL.nonEmpty) {
+        CityDBHandleUtil.createTable(sqlXmlEntity, dBProperties.asJava)
+      }
+    }
   }
+
+  // 如果是入库程序，需要在程序执行完成的时候输出入库完成日志
+  def writeInputDBSuccessLog(dateStr: String, dbSettingMap: mutable.Map[String, DBConnectInfo]): Unit = {
+    CityDBHandleUtil.writeInputDBSuccessLog(dateStr, dbSettingMap.asJava)
+  }
+
 }

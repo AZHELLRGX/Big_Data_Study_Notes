@@ -39,6 +39,15 @@
             [用户组ID] [bigint] NULL
             )
         </table>
+        <table model="valid_data">
+            if exists (select * from dbo.sysobjects where id = object_id(N'[valid_data]')
+            and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+            drop table [valid_data];
+            CREATE TABLE [dbo].[valid_data](
+            [CityID] [int] NOT NULL,
+            [IMSI] [varchar](50) NOT NULL
+            )
+        </table>
     </create>
 
     <!-- 数据写出到DB -->
@@ -58,6 +67,12 @@
     <sql dataPath="hdfs://master:9000/usr/rgx/resident/tb_mr_user_location_group_${provider}_dd_${date}"
          method="overwrite"
          sparkMapName="resident_location_agg_user_duration" delimiter="\t">
+    </sql>
+
+    <!-- 测试一个空数据写出的时候是否存在问题 -->
+    <sql dbId="MAIN" method="overwrite" dbTableName="valid_data_${provider}_dd_${date}"
+         modelName="valid_data"
+         sparkMapName="valid_dataPath_test">
     </sql>
 
 </output>

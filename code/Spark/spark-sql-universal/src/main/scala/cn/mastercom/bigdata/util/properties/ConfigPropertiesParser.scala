@@ -32,21 +32,22 @@ object ConfigPropertiesParser {
     log.info("userDir is {}", userDir)
     val coreProperties = loadProperties(s"$userDir/conf/$appName/properties/core.properties")
     val debug = coreProperties.getProperty("debug")
+    val cityIdFilter = coreProperties.getProperty(CITY_ID_FILTER)
 
     // 输入参数：日期(通常应该按照6位数来)
     if (args.length == 4) {
       val dateStr = args(2) // 只有在创建天表与数据输入输出的时候解析通配符有效
       val provider = args(3) // 厂商(yd、lt、dt)也是一个很重要的通用配置
-      CoreConfig(debug.toBoolean, appName, dateStr, provider, userDir)
+      CoreConfig(debug.toBoolean, appName, dateStr, provider, userDir, cityIdFilter)
     }
     else if (args.length == 3) {
       val dateStr = args(2)
-      CoreConfig(debug.toBoolean, appName, dateStr, YD, userDir)
+      CoreConfig(debug.toBoolean, appName, dateStr, YD, userDir, cityIdFilter)
     }
     else {
       val format = new SimpleDateFormat("yyMMdd")
       val dateStr = format.format(new Date())
-      CoreConfig(debug.toBoolean, appName, dateStr, YD, userDir)
+      CoreConfig(debug.toBoolean, appName, dateStr, YD, userDir, cityIdFilter)
     }
   }
 
@@ -93,10 +94,11 @@ object ConfigPropertiesParser {
   }
 
   // 核心配置文件
-  case class CoreConfig(debug: Boolean, appName: String, dateStr: String, provider: String, userDir: String)
+  case class CoreConfig(debug: Boolean, appName: String, dateStr: String, provider: String, userDir: String, cityIdFilter: String)
 
   // 数据库配置映射
   case class DBConnectInfo(url: String, username: String, password: String, driver: String)
+
 }
 
 

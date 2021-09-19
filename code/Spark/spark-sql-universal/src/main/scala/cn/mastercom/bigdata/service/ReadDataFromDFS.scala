@@ -12,16 +12,21 @@ import scala.collection.mutable.ListBuffer
 
 /**
  * 从文件系统中读取数据
- * 注意：在Spark3.0中，Row这个对象好像没有自动序列化，这里与Spark2.0存在一定差异
- * 在3.0版本中需要手动序列化
+ * Spark3.0版本后，Row对象没有自动序列化，需要手动序列化
  */
 object ReadDataFromDFS extends Serializable {
   private val log: Logger = LoggerFactory.getLogger(ReadDataFromDFS.getClass)
 
   def readDataFromDFS(sqlXmlEntities: ListBuffer[SqlXmlEntity], session: SparkSession, coreConfig: CoreConfig): Unit = {
     for (sqlXmlEntity <- sqlXmlEntities) {
+
       // 加载数据
-      val rdd = readData(sqlXmlEntity, session, coreConfig)
+      val rdd = if (sqlXmlEntity.multiDays > 0 || pathIsValid(session, sqlXmlEntity.dataPath)) {
+        // 需要注意多天数据的判断
+        readData(sqlXmlEntity, session, coreConfig)
+      } else {
+        session.sparkContext.emptyRDD[Row]
+      }
 
       // 获取类型
       val schema = getStructType(sqlXmlEntity.fieldMap)
@@ -50,23 +55,31 @@ object ReadDataFromDFS extends Serializable {
       // 读取HDFS多天目录数据
       for (i <- 0 to sqlXmlEntity.multiDays) {
         val dateStr = DateUtil.getBeforeDay(coreConfig.dateStr, -i)
-        dataPathList.append(sqlXmlEntity.dataPath.replace("${multiDate}", dateStr))
+        val dataPath = sqlXmlEntity.dataPath.replace(MULTI_DATE, dateStr)
+        // 多天数据也需要判空
+        if (pathIsValid(session, dataPath))
+          dataPathList.append(dataPath)
       }
     } else {
       dataPathList.append(sqlXmlEntity.dataPath)
     }
-    // 可以一次性读取多天数据
-    session.sparkContext.textFile(dataPathList.mkString(",")).map(
-      line => {
-        val data = line.split(sqlXmlEntity.delimiter)
-        val array = ListBuffer[Any]()
-        for (field <- sqlXmlEntity.fieldMap.fields) {
-          // 数据需要根据类型提前转化
-          array.append(typeConverter(data(field.index), field.fieldType))
+    if (dataPathList.nonEmpty) {
+      // 可以一次性读取多天数据
+      session.sparkContext.textFile(dataPathList.mkString(",")).map(
+        line => {
+          val data = line.split(sqlXmlEntity.delimiter)
+          val array = ListBuffer[Any]()
+          for (field <- sqlXmlEntity.fieldMap.fields) {
+            // 数据需要根据类型提前转化
+            array.append(typeConverter(data(field.index), field.fieldType))
+          }
+          Row.fromSeq(array)
         }
-        Row.fromSeq(array)
-      }
-    )
+      )
+    } else {
+      // 多天数据均不存在也返回空RDD
+      session.sparkContext.emptyRDD[Row]
+    }
   }
 
   /**
@@ -92,10 +105,12 @@ object ReadDataFromDFS extends Serializable {
    */
   private def typeConverter(fieldValue: String, fieldType: String): Any = {
     fieldType match {
+      // todo 测试阶段先使用这几种类型转换
       case "int" => fieldValue.toInt
       case "bigint" => fieldValue.toLong
       case "long" => fieldValue.toLong
       case "double" => fieldValue.toDouble
+      case "float" => fieldValue.toFloat
       case _ => fieldValue
     }
   }
@@ -113,6 +128,7 @@ object ReadDataFromDFS extends Serializable {
       case "bigint" => DataTypes.LongType
       case "long" => DataTypes.LongType
       case "double" => DataTypes.DoubleType
+      case "float" => DataTypes.FloatType
       case _ => DataTypes.StringType
     }
   }

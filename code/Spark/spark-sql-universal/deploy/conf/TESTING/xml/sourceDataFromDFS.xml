@@ -32,6 +32,11 @@
         19	Position	int
     </fieldMap>
 
+    <fieldMap name="valid_dataPath_field_map">
+        0	CityID	int
+        1	imsi	string
+    </fieldMap>
+
     <!-- dataPath也支持厂商、日期等通配符设置 -->
     <!-- 本地debug可以加上hdfs服务名称 -->
     <sql dataPath="hdfs://master:9000/usr/rgx/resident/tb_mr_user_location_${provider}_dd_${multiDate}" delimiter="\t"
@@ -39,5 +44,10 @@
          registerTableName="resident_location_valid" multiDays="1">
         <!-- 此处SQL可以为空,为空则Spark注册表名不生效 -->
         SELECT * FROM resident_location WHERE CityID = 6101
+    </sql>
+
+    <!-- 测试一个不存在的路径处理效果 -->
+    <sql dataPath="hdfs://master:9000/usr/rgx/valid_dataPath" delimiter="\t"
+         fieldMap="valid_dataPath_field_map" sparkMapName="valid_dataPath_test">
     </sql>
 </readFromHDFS>

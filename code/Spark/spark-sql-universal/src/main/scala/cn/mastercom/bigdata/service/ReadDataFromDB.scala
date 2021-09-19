@@ -13,7 +13,7 @@ object ReadDataFromDB {
   private val log: Logger = LoggerFactory.getLogger(ReadDataFromDB.getClass)
 
   def readDataFromDB(sqlXmlEntities: ListBuffer[SqlXmlEntity], coreConfig: CoreConfig, dBProperties: mutable.Map[String, DBConnectInfo]
-                     , mainDbSettingMap: mutable.Map[String, mutable.Map[Integer, DBConnectInfo]], session: SparkSession): Unit = {
+                     , mainDbSettingMap: mutable.Map[String, mutable.Map[String, DBConnectInfo]], session: SparkSession): Unit = {
     for (sqlXmlEntity <- sqlXmlEntities) {
       if (sqlXmlEntity.dbId.isEmpty || sqlXmlEntity.dbTableName.isEmpty) {
         log.warn("属性dbId或者dbTableName为空, 判定为非法配置, 其他信息为{}", sqlXmlEntity)
@@ -46,7 +46,7 @@ object ReadDataFromDB {
     }
   }
 
-  private def readCityData(sqlXmlEntity: SqlXmlEntity, mainDbSettingMap: mutable.Map[String, mutable.Map[Integer, DBConnectInfo]],
+  private def readCityData(sqlXmlEntity: SqlXmlEntity, mainDbSettingMap: mutable.Map[String, mutable.Map[String, DBConnectInfo]],
                            coreConfig: CoreConfig, session: SparkSession): Unit = {
     // 存放表与地市库连接信息的元组列表
     val tupleList = new ListBuffer[(String, DBConnectInfo)]()
@@ -59,10 +59,10 @@ object ReadDataFromDB {
     if (sqlXmlEntity.multiDays > 0) {
       for (i <- 0 to sqlXmlEntity.multiDays) {
         val dateStr = DateUtil.getBeforeDay(coreConfig.dateStr, -i)
-        val realTableName = sqlXmlEntity.dbTableName.replace("${multiDate}", dateStr)
+        val realTableName = sqlXmlEntity.dbTableName.replace(MULTI_DATE, dateStr)
         for (elem <- cityConnectionInfo) {
           // cityId大于0的才是地市库
-          if (elem._1 > 0) {
+          if (elem._1.toInt > 0) {
             tupleList.append((realTableName, elem._2))
           }
         }

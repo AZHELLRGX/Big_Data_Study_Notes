@@ -34,6 +34,7 @@ package object util {
   val PROVIDER_WC = "${provider}"
   val DATE_WC = "${date}"
   val CITY_DISTRIBUTION = "cityDistribution"
+  val CITY_ID_FILTER = "cityIdFilter"
   // 四个XML配置文件
   val XML_FILE_NAME_ARRAY: Array[String] = Array[String]("sourceDataFromDB", "sourceDataFromDFS", "dataProcessing", "dataOutPut")
 

@@ -6,6 +6,8 @@ import org.apache.spark.sql.SparkSession
 
 package object service {
 
+  val MULTI_DATE = "${multiDate}";
+
   /**
    * 缓存指定的表数据
    *
@@ -19,6 +21,42 @@ package object service {
       session.sqlContext.cacheTable(sqlXmlEntity.sparkMapName)
     } else if (sqlXmlEntity.registerTableName.nonEmpty && sqlXmlEntity.cacheSet.contains(sqlXmlEntity.registerTableName)) {
       session.sqlContext.cacheTable(sqlXmlEntity.registerTableName)
+    }
+  }
+
+  /**
+   * 检测路径是否存在且不为空
+   */
+  def pathIsValid(spark: SparkSession, path: String): Boolean = {
+    pathIsExist(spark, path) && get_path_size(spark, path) > 0
+  }
+
+
+  /**
+   * 判断目录是否存在,注意：只能在driver端使用，可以多线程来提速。
+   */
+  def pathIsExist(spark: SparkSession, path: String): Boolean = {
+    //取文件系统
+    val filePath = new org.apache.hadoop.fs.Path(path)
+    val fileSystem = filePath.getFileSystem(spark.sparkContext.hadoopConfiguration)
+
+    // 判断路径是否存在
+    fileSystem.exists(filePath)
+  }
+
+  /**
+   * 获取某个目录的大小(单位b字节),注意：只能在driver端使用，可以多线程来提速。
+   */
+  def get_path_size(spark: SparkSession, path: String): Long = {
+    //取文件系统
+    val filePath = new org.apache.hadoop.fs.Path(path)
+    val fileSystem = filePath.getFileSystem(spark.sparkContext.hadoopConfiguration)
+
+    // 获取该目录的大小，单位是字节
+    if (fileSystem.exists(filePath)) {
+      fileSystem.getContentSummary(filePath).getLength
+    } else {
+      0
     }
   }
 }
