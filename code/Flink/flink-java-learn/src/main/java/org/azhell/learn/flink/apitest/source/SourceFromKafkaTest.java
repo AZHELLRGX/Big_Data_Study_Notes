@@ -25,7 +25,8 @@ public class SourceFromKafkaTest {
         properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
 
         // 参数是一个SourceFunction
-        env.addSource(new FlinkKafkaConsumer011<String>("sensor", new SimpleStringSchema(), properties));
+        env.addSource(new FlinkKafkaConsumer011<>("sensor", new SimpleStringSchema(), properties))
+                .print();
 
         env.execute();
     }
