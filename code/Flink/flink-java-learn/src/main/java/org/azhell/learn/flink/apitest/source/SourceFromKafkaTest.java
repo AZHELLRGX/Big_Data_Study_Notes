@@ -13,6 +13,7 @@ import java.util.Properties;
 public class SourceFromKafkaTest {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        System.out.println(env.getStreamTimeCharacteristic());
 
         // kafka 配置项
         Properties properties = new Properties();
@@ -29,5 +30,6 @@ public class SourceFromKafkaTest {
                 .print();
 
         env.execute();
+
     }
 }
