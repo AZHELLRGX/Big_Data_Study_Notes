@@ -179,6 +179,11 @@ create 't1',{NAME => 'f1', VERSIONS => 2},{NAME => 'f2', VERSIONS => 2}
 ```shell
 disable 't1' # 下线
 drop 't1' # 删除
+
+# 删除所有的表
+disable_all 'rgx:.*' # 然后选择确定
+# 删除所有表
+drop_all 'rgx:.*'
 ```
 
 #### 查看表的结构
