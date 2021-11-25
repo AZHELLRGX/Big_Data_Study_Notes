@@ -66,17 +66,32 @@ flink run-application -t yarn-application \
 -Djobmanager.memory.process.size=1024m \
 -Dtaskmanager.memory.process.size=1024m \
 -Dtaskmanager.numberOfTaskSlots=2 \
--Dparallelism.default=10 \
+-Dparallelism.default=20 \
 -c com.chinaunicom.app.DecoderCmApp lte-wireless-cloud-analysis-1.0.0-alpha.jar --checkpointURI hdfs://master:9000/wcs/liantong/tmp --province zj
 
 flink run-application -t yarn-application \
 -Dyarn.provided.lib.dirs='hdfs://master:9000/usr/rgx/flink/dependency' \
--Dyarn.application.name='MT_CMPM_ZJ_PM_RGX' \
+-Dyarn.application.name='MT_CMPM_ZJ_PM' \
+-Djobmanager.memory.process.size=1024m \
+-Dtaskmanager.memory.process.size=1024m \
+-Dtaskmanager.numberOfTaskSlots=2 \
+-Dparallelism.default=20 \
+-c com.chinaunicom.app.DecoderPmApp lte-wireless-cloud-analysis-1.0.0-alpha.jar --checkpointURI hdfs://master:9000/wcs/liantong/tmp --province zj
+```
+
+### 110环境
+
+```shell
+export HADOOP_CLASSPATH=`hadoop classpath`
+flink run-application -t yarn-application \
+-Dyarn.application.queue=qmingtong \
+-Dyarn.provided.lib.dirs='hdfs://wydsj/unicom/flink/dependency;hdfs://wydsj/unicom/flink/lib;hdfs://wydsj/unicom/flink/plugins' \
+-Dyarn.application.name='MT_CMPM_ZJ_CM' \
 -Djobmanager.memory.process.size=1024m \
 -Dtaskmanager.memory.process.size=1024m \
 -Dtaskmanager.numberOfTaskSlots=2 \
 -Dparallelism.default=2 \
--c com.chinaunicom.app.DecoderPmApp lte-wireless-cloud-analysis-1.0.0-alpha.jar --checkpointURI hdfs://master:9000/wcs/liantong/tmp --province zj
+-c com.chinaunicom.app.DecoderCmApp lte-wireless-cloud-analysis-1.0.0-alpha.jar --checkpointURI hdfs://wydsj/unicom/checkPoint --province zj
 ```
 
 
@@ -85,17 +100,17 @@ flink run-application -t yarn-application \
 
 ```shell
 export HADOOP_CLASSPATH=`hadoop classpath`
-kinit zb_zhw_cmpm_mt@ODATA.NCMP.UNICOM.LOCAL -kt /home/zb_zhw_cmpm_mt/zb_zhw_cmpm_mt.keytab
 # 方式三 参考如下部署模式 使用run-application方式部署
 flink run-application -t yarn-application \
 -Dyarn.application.queue=default \
 -Dyarn.provided.lib.dirs='hdfs://hdfsunity/user/zb_zhw_cmpm_mt/flink/dependency;hdfs://hdfsunity/user/zb_zhw_cmpm_mt/flink/lib;hdfs://hdfsunity/user/zb_zhw_cmpm_mt/flink/plugins' \
 -Dyarn.application.name='MT_CMPM_ZJ_CM' \
 -Djobmanager.memory.process.size=2048m \
--Dtaskmanager.memory.process.size=4096m \
+-Dtaskmanager.memory.process.size=2048m \
 -Dtaskmanager.numberOfTaskSlots=2 \
 -Dparallelism.default=20 \
--Dsecurity.kerberos.login.keytab=/home/zb_zhw_cmpm_mt/zb_zhw_cmpm_mt.keytab \
+-Dsecurity.kerberos.login.use-ticket-cache=false \
+-Dsecurity.kerberos.login.keytab=/home/dev/cmpm/zb_zhw_cmpm_mt.keytab \
 -Dsecurity.kerberos.login.principal=zb_zhw_cmpm_mt@ODATA.NCMP.UNICOM.LOCAL \
 -Dsecurity.kerberos.login.contexts=Client,KafkaClient \
 -Djava.security.krb5.conf=/etc/krb5.conf \
@@ -488,7 +503,7 @@ flink run-application -t yarn-application \
 监控界面往往存在一些问题，看不到全量的日志，可以使用如下命令查看完整日志
 
 ```shell
-yarn logs -applicationId application_1633658820683_0126
+yarn logs -applicationId application_1633658820683_0170
 ```
 
 监控界面
