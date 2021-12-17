@@ -24,7 +24,7 @@
 
 ### Region自动拆分原理
 
-- 每一个region维护着StartKey 与 EndKey，如果加入的数据符合某个region维护的Rowkey范围，则该数据交给这个region维护。
+- 每一个region维护着StartKey 与 EndKey，如果加入的数据符合某个region维护的RowKey范围，则该数据交给这个region维护。
 - 默认情况下，HBase建表的时候会默认为表分配一个Region，当数据量到达一定的阈值，HBase就会拆分这个Region
 - Region的拆分是不可见的，Master 不会参与其中。RegionServer 拆分 Region的步骤是：先将该 Region 下线，然后拆分，将其子 Region 加入到 META 元信息中，再将他们加入到原本的 RegionServer 中，最后汇报 Master。执行 split 的线程是 CompactSplitThread。
 
@@ -135,20 +135,53 @@ hAdmin.createTable(tableDesc, splitKeys);
 
 [详解布隆过滤器的原理，使用场景和注意事项 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/43263751)
 
-# Rowkey的设计
+## RowKey的设计原则
 
-HBase中的数据是根据Rowkey的字典顺序来排序的，Rowkey决定了数据将会被分到哪一个分区。一个好的Rowkey方案设计可以避免数据倾斜，让数据均匀的分布到所有的Region中，尽量保证数据访问的时候不会出现热点问题
+### RowKey在查询中的作用
 
-Rowkey的设计让让Scan操作更加方便，但是也容易出现热点问题，数据倾斜的时候会导致大量的客户端请求访问到少数的几个Region，导致部分RegionServer的负载很高，导致性能下降，甚至不可用
+- 通过 **get** 方式，指定 **RowKey** 获取唯一一条记录
+- 通过 **scan** 方式，设置 **startRow** 和 **stopRow** 参数进行范围匹配
+- **全表扫描**，即直接扫描整张表中所有行记录
 
-## Rowkey优化
+### RowKey在Region中的作用
 
-- **长度**：Rowkey可以使任意字符串，最大长度64kb，建议越短越好，最好不要超过16个字节，原因如下:
-  - 目前操作系统都是64位系统，内存8字节对齐，控制在16字节，8字节的整数倍利用了操作系统的最佳特性。
-  - Hbase将部分数据加载到内存当中，如果Rowkey太长，内存的有效利用率就会下降。
-- **唯一**：必须唯一，否则会发生本是插入的新数据，但是却更新了之前的数据
-- **散列**
-  - **加盐**：在Rowkey的前面增加随机数，散列之后的Rowkey就会根据随机生成的前缀分散到各个Region上，可以有效的避免热点问题。但是加盐这种方式增加了写的吞吐，**但是使得读数据更加困难**
-  - **Hash**：Hash算法包含了MD5等算法，可以直接取Rowkey的MD5值作为Rowkey，或者取MD5值拼接原始Rowkey，组成新的Rowkey，由于Rowkey设计不应该太长，所以可以对MD5值进行截取拼接【好像目前用的最多的方法】
-- **字符串反转**：时间戳反转、手机号反转等
+-  读写数据时通过 RowKey 找到对应的 Region 
+-  MemStore 中的数据是按照 RowKey 的字典序排序 
+-  HFile 中的数据是按照 RowKey 的字典序排序 
+
+### RowKey设计原则
+
+####  **长度原则** 
+
+RowKey是一个二进制码流，可以是任意字符串，最大长度为64kb，实际应用中一般为10-100byte，以byte[]形式保存，一般设计成定长。建议越短越好，不要超过16个字节，原因如下：
+
+- 数据的持久化文件HFile中时按照Key-Value存储的，如果RowKey过长，例如超过100byte，那么1000w行的记录，仅RowKey就需占用近1GB的空间。这样会极大影响HFile的存储效率。
+- MemStore会缓存部分数据到内存中，若RowKey字段过长，内存的有效利用率就会降低，就不能缓存更多的数据，从而降低检索效率。
+- 目前操作系统都是64位系统，内存8字节对齐，控制在16字节，8字节的整数倍利用了操作系统的最佳特性。
+
+####  **唯一原则** 
+
+#### **排序原则**
+
+HBase的RowKey是按照ASCII有序排序的，因此我们在设计RowKey的时候要充分利用这点。
+
+#### 散列原则
+
+设计的RowKey应均匀的分布在各个HBase节点上。
+
+### 避免数据热点的方案
+
+####  **Reversing** 【翻转】
+
+如果正序设计的RowKey在数据分布上不均匀，但是尾部却呈现了良好的随机性，此时，可以考虑将RowKey的信息翻转，或者直接将尾部的bytes提前到RowKey的开头。Reversing可以有效的使RowKey随机分布，但是牺牲了RowKey的有序性。  利于Get操作，但不利于Scan操作，因为数据在原RowKey上的自然顺序已经被打乱 。
+
+####  **Salting** 【盐值】
+
+ Salting（加盐）的原理是在原RowKey的前面添加固定长度的随机数，也就是给RowKey分配一个随机前缀使它和之间的RowKey的开头不同。随机数能保障数据在所有Regions间的负载均衡。 
+
+但是因为添加的是随机数，基于原RowKey查询时无法知道随机数是什么，那样在查询的时候就需要去各个可能的Regions中查找，Salting对于读取是利空的。并且加盐这种方式增加了读写时的吞吐量。 
+
+####  **Hashing** 【哈希】
+
+ 基于 RowKey 的完整或部分数据进行 Hash，而后将Hashing后的值完整替换或部分替换原RowKey的前缀部分。这里说的 hash 包含 MD5、sha1、sha256 或 sha512 等算法。 但是与 Reversing 类似，Hashing 也不利于 Scan，因为打乱了原RowKey的自然顺序。 
 
