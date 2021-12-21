@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    url: vkKh0wl8SaiChWar0u6h5oFCPIffwP6RpYvncH4uAP0mq931wwynU9Pi2UoCGfCIEB0wmF/vSbl6cVqaTpbe8dJsyttGvXRE
+    driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    username: hKIVaqBPyrk=
+    password: hKIVaqBPyrk=
+#spring:
+#  datasource:
+#    url: ESrMfvbfqjJJg1+rqVLjWXg8Cg8u6XrzjGjov0FgiCj/JYQmzEUpHer4+rDgiK1C9EA8ylYgtG5FWzUnlfR2oNAMTrLVSD2NEDmP/FKeBFZruNbihyLWm9bEE7U8ghD/+1KK5NOZe5R0kR+ZoYs1lenNYAT3348G
+#    driverClassName: com.mysql.jdbc.Driver
+#    username: hKIVaqBPyrk=
+#    password: hKIVaqBPyrk=
+
+
+setting:
+  id: 1 # 多个目标服务器以英文逗号分割
+  threadCount: 10
+  # 以下配置取默认配置就好，一般不要改动
+  typeConversion: yes
+  fetchSize: 3000 # 批量读取
+  batchByteSize: 335544320 # 32 * 1024 * 1024
+  # 设置bcp导入导出的文件路径
+  bcpDir: F:\mastercom\job\datax-sync\data-sync-test
+
+# 以下配置取默认配置就好，一般不要改动
+channel:
+  capacity: 10000
+  recordSpeed: -1
+  byteSpeed: -1
+  flowControlInterval: 20
+  byteCapacity: 67108864  # 单条语句的byte大小限制
+  bufferSize: 32
+
+logging:
+  level:
+    root: info
+  pattern:
+    console: '%d{yyyy-MMM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{15} - %msg%n'
+  file:
+    max-history: 30
+  path: log
