@@ -49,7 +49,11 @@
             <artifactId>flink-csv</artifactId>
             <version>${flink.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-filesystem_${scala.version}</artifactId>
+            <version>1.11.6</version>
+        </dependency>
 
     </dependencies>
 
