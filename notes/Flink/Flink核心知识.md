@@ -87,3 +87,67 @@ Flink 分布式快照里面的一个核心的元素就是流屏障（stream barr
 ![1638889153473](Flink核心知识.assets/1638889153473.png)
 
 ![1638889594255](Flink核心知识.assets/1638889594255.png)
+
+# 多流Join
+
+## Flink中可选的三种数据Join方式
+
+1、使用DataStream的API，我们使用connect操作，然后再使用RichFlatMapFunction或者是CoProcessFunction中手动实现Join，它们可以将数据保持在state中，在CoProcessFunction中可以使用计时器，定时进行数据的关联，然后定期清理过期的state。
+
+2、使用Table API，我们自己实现一个UDTF来访问维表
+
+3、使用流JOIN来实现
+
+下面还是主要关注Flink中的多流Join
+
+## 多流JOIN
+
+流的Join也分为两种，Window Join和 Interval Join
+
+### Window Join
+
+窗口join会join具有相同的key并且处于同一个窗口中的两个流的元素
+
+- 所有的窗口join都是inner join, 意味着a流中的元素如果在b流中没有对应的, 则a流中这个元素就不会处理(就是忽略掉了)
+- join成功后的元素的会以所在窗口的最大时间作为其时间戳. 例如窗口[5,10), 则元素会以9作为自己的时间戳
+
+#### 滚动窗口Join
+
+ ![img](Flink%E6%A0%B8%E5%BF%83%E7%9F%A5%E8%AF%86.assets/20210312234236428.png) 
+
+#### 滑动窗口Join
+
+ ![img](Flink%E6%A0%B8%E5%BF%83%E7%9F%A5%E8%AF%86.assets/20210312234345194.png)  
+
+#### 会话窗口Join
+
+ ![img](Flink%E6%A0%B8%E5%BF%83%E7%9F%A5%E8%AF%86.assets/20210312234353720.png) 
+
+### Interval Join
+
+间隔流join(Interval Join), 是指使用一个流的数据按照key去join另外一条流的指定范围的数据
+
+需要注意的是： Interval Join只支持事件时间。 
+
+如下图: 橙色的流去join绿色的流. 范围是由橙色流的event-time + lower bount和event-time + upper bount的范围来决定的.
+
+> orangeElem.ts + lowerBound <= greenElem.ts <= orangeElem.ts + upperBound
+
+ ![img](Flink%E6%A0%B8%E5%BF%83%E7%9F%A5%E8%AF%86.assets/20210312234519945.png) 
+
+其中，上界和下界可以是负数，也可以是正数。Interval join目前只支持INNER JOIN。将连接后的元素传递给ProcessJoinFunction时，时间戳变为两个元素中最大的那个时间戳。 
+
+### 代码实践
+
+以上知识点相关代码路径
+
+```
+[flink-java-learn]   org.azhell.learn.flink.jointest
+```
+
+> 参考博文：
+>
+> [Flink中如何做流Join](https://zhuanlan.zhihu.com/p/340560908) 
+>
+> [Flink双流join](https://blog.csdn.net/weixin_42796403/article/details/114713553) 
+

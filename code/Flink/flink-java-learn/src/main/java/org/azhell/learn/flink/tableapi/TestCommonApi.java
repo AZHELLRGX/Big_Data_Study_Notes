@@ -23,7 +23,7 @@ public class TestCommonApi {
         // file-source
         tableEnv.executeSql(ConnectSQL.fileDataSql());
         Table table = tableEnv.sqlQuery(CrudSQL.selectFromSensor());
-        // Table table = tableEnv.from("Sensor").select();
+        // Table table = tableEnv.from("Sensor").select()
         tableEnv.toAppendStream(table, Row.class).print();
         DataStreamSource<String> stringDataStreamSource = env.socketTextStream("192.168.2.101", 7777);
         // kafka-sink
