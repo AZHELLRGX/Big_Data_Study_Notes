@@ -12,7 +12,7 @@ public class BaseTransformTest {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // 从文件读取数据
-        DataStream<String> inputStream = env.readTextFile("src/main/resources/sensor.txt");
+        DataStream<String> inputStream = env.readTextFile("src/main/resources/data/sensor.txt");
 
         // 1. map，把String转换成长度输出
         DataStream<Integer> mapStream = inputStream.map(String::length);

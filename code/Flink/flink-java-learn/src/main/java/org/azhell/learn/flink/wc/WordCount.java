@@ -15,7 +15,7 @@ public class WordCount {
         // 创建执行环境
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         // 从文件中读取数据
-        String inputPath = "src/main/resources/hello.txt";
+        String inputPath = "src/main/resources/data/hello.txt";
         DataSource<String> inputDs = env.readTextFile(inputPath);
         // 对数据集进行处理
         // 在Java使用lambda表达式需要注意声明类型

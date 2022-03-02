@@ -3,7 +3,6 @@ package org.azhell.learn.flink.jointest;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 
@@ -14,14 +13,14 @@ import java.math.BigDecimal;
  */
 public class TestTumbleWindowJoin {
     public static void main(String[] args) throws Exception {
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+
 
         // 构建商品数据流
-        SingleOutputStreamOperator<Goods> goodsDS = env.addSource(new GoodsSourceFunction(), TypeInformation.of(Goods.class))
+        SingleOutputStreamOperator<Goods> goodsDS = PkgConst.env.addSource(new GoodsSourceFunction(), TypeInformation.of(Goods.class))
                 .assignTimestampsAndWatermarks(new GoodsWatermark() {
                 });
         // 构建订单明细数据流
-        SingleOutputStreamOperator<OrderItem> orderItemDS = env.addSource(new OrderItemSourceFunction(), TypeInformation.of(OrderItem.class))
+        SingleOutputStreamOperator<OrderItem> orderItemDS = PkgConst.env.addSource(new OrderItemSourceFunction(), TypeInformation.of(OrderItem.class))
                 .assignTimestampsAndWatermarks(new OrderItemWatermark());
 
         /*
@@ -48,6 +47,6 @@ public class TestTumbleWindowJoin {
 
         factOrderItemDS.print();
 
-        env.execute("滚动窗口JOIN");
+        PkgConst.env.execute("滚动窗口JOIN");
     }
 }

@@ -18,7 +18,7 @@ public class RollingAggregationTransformTest {
         env.setParallelism(4);
 
         // 从文件读取数据
-        DataStream<String> inputStream = env.readTextFile("src/main/resources/sensor.txt");
+        DataStream<String> inputStream = env.readTextFile("src/main/resources/data/sensor.txt");
 
         // 转换成SensorReading类型
         DataStream<SensorReading> dataStream = inputStream.map(line -> {

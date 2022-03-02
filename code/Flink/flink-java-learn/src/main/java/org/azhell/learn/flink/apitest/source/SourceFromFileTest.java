@@ -12,7 +12,7 @@ public class SourceFromFileTest {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-        DataStreamSource<String> sensorDs = env.readTextFile("src/main/resources/sensor.txt");
+        DataStreamSource<String> sensorDs = env.readTextFile("src/main/resources/data/sensor.txt");
         SingleOutputStreamOperator<SensorReading> operator = sensorDs.map(s -> {
             String[] strings = s.split(",");
             return new SensorReading(strings[0], Long.parseLong(strings[1]), Double.parseDouble(strings[2]));

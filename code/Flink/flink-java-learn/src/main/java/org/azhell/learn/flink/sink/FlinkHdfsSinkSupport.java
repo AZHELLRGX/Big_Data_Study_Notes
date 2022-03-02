@@ -13,27 +13,32 @@ import org.apache.flink.streaming.api.functions.sink.filesystem.rollingpolicies.
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Flink利用filesystem的connector写出数据的通用模版
+ */
 public class FlinkHdfsSinkSupport {
-    
+
     private FlinkHdfsSinkSupport() {
         // private hdfs
     }
 
     // 写出数据到HDFS的sink
     public static StreamingFileSink<Tuple2<String, String>> getStreamFileSink(String path) {
-        DefaultRollingPolicy<Tuple2<String, String>, String> defaultRollingPolicy = DefaultRollingPolicy.builder()
-                .withInactivityInterval(TimeUnit.MINUTES.toMillis(5))  //5m空闲，就滚动写入新的文件
-                .withRolloverInterval(TimeUnit.MINUTES.toMillis(10)) //不论是否空闲，超过10分钟就写入新文件，默认60s。这里设置为10m
+        final DefaultRollingPolicy<Tuple2<String, String>, String> build = DefaultRollingPolicy.builder()
+                .withInactivityInterval(Duration.ofMinutes(5).toMillis())  //5m空闲，就滚动写入新的文件
+                .withRolloverInterval(Duration.ofMinutes(10).toMillis()) //不论是否空闲，超过10分钟就写入新文件，默认60s。这里设置为10m
                 .withMaxPartSize(134217728) // 设置每个文件的最大大小 ,默认是128M
                 .build();
 
-
         return StreamingFileSink
-                .forRowFormat(new Path(path), new CustomizedStringEncoder("UTF-8"))//设置文件路径，以及文件中的编码格式
+                // 输出文件格式为txt文本格式
+                .forRowFormat(new Path(path), new CustomizedStringEncoder(StandardCharsets.UTF_8.toString()))//设置文件路径，以及文件中的编码格式
                 .withBucketAssigner(new CustomizedBucketAssigner())//设置自定义分桶
-                .withRollingPolicy(defaultRollingPolicy)//设置文件滚动条件
+                .withRollingPolicy(build)//设置文件滚动条件
                 .withBucketCheckInterval(TimeUnit.MINUTES.toMillis(5))//设置检查点
                 .build();
     }
@@ -63,7 +68,7 @@ public class FlinkHdfsSinkSupport {
         private static final long serialVersionUID = -7229684350852113483L;
 
         @Override
-        public String getBucketId(Tuple2<String, String> value, Context context) {
+        public String getBucketId(Tuple2<String, String> value, BucketAssigner.Context context) {
             // 数据路径，目录
             return value.f0;
         }
@@ -73,6 +78,5 @@ public class FlinkHdfsSinkSupport {
             return SimpleVersionedStringSerializer.INSTANCE;
         }
     }
-
 
 }

@@ -9,7 +9,7 @@ object ConnectSQL {
       |  temperature DOUBLE
       |) WITH (
       |  'connector' = 'filesystem',
-      |  'path' = 'file:///D:/work-space/github/Big_Data_Study_Notes/code/Flink/flink-java-learn/src/main/resources/sensor.txt',
+      |  'path' = 'file:///D:/work-space/github/Big_Data_Study_Notes/code/Flink/flink-java-learn/src/main/resources/data/sensor.txt',
       |  'format' = 'csv'
       |)
       |""".stripMargin

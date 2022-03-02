@@ -2,7 +2,6 @@ package org.azhell.learn.flink.jointest;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.co.ProcessJoinFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
@@ -14,14 +13,13 @@ import java.math.BigDecimal;
  */
 public class TestIntervalJoin {
     public static void main(String[] args) throws Exception {
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // 构建商品数据流
-        SingleOutputStreamOperator<Goods> goodsDS = env.addSource(new GoodsSourceFunction(), TypeInformation.of(Goods.class))
+        SingleOutputStreamOperator<Goods> goodsDS = PkgConst.env.addSource(new GoodsSourceFunction(), TypeInformation.of(Goods.class))
                 .assignTimestampsAndWatermarks(new GoodsWatermark() {
                 });
         // 构建订单明细数据流
-        SingleOutputStreamOperator<OrderItem> orderItemDS = env.addSource(new OrderItemSourceFunction(), TypeInformation.of(OrderItem.class))
+        SingleOutputStreamOperator<OrderItem> orderItemDS = PkgConst.env.addSource(new OrderItemSourceFunction(), TypeInformation.of(OrderItem.class))
                 .assignTimestampsAndWatermarks(new OrderItemWatermark());
 
         /*
@@ -51,7 +49,7 @@ public class TestIntervalJoin {
 
         factOrderItemDS.print();
 
-        env.execute("Interval JOIN");
+        PkgConst.env.execute("Interval JOIN");
     }
 }
 
